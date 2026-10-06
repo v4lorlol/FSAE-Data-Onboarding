@@ -18,13 +18,13 @@ table = pq.read_pandas('software-data.parquet')
 rawData = table.to_pandas()
 filledTable = rawData.ffill()
 # print(filledTable)
-# print("NaN counts per column:")  # Check if the forward fill was functioning correctly and if any NaN's remain
+# print("NaN counts per column:")  # Check if the forward fill was functioning correctly and if any NaNs remain
 # print(filledTable.isna().sum()) 
 
 
 # STEP 2 & 3
 
-# Defining the parameters (?) idk what to call them 
+# Defining the parameters (?) idk what to call them so it's parameters
 wheelRad = 0.2
 gearRatio = (12/41)
 filledTable["Velocity"] = filledTable["SME_TRQSPD_Speed"] * wheelRad * (2 * math.pi / 60) * gearRatio # Makes a new row in the table that is the velocity
@@ -67,10 +67,10 @@ time = filledTable["Time"] # Yeah as many iterations as I've gone through of thi
 #    print(time, vel)
 
 # Defining parameters for each state of the car
-driving       = filledTable["Velocity"] > 0.1
+driving = filledTable["Velocity"] > 0.1
 accelerating = filledTable["ETC_STATUS_PEDAL_TRAVEL"] > 1
-braking      = filledTable["ETC_STATUS_BRAKE_SENSE_VOLTAGE"] - 350 > 10 & driving
-coasting     = ~accelerating & ~braking & driving
+braking = filledTable["ETC_STATUS_BRAKE_SENSE_VOLTAGE"] - 350 > 10 & driving
+coasting = ~accelerating & ~braking & driving
 
 # STEP 4
 
@@ -102,16 +102,15 @@ laps = [(22.105, 51.024), (51.024, 77.349), (97.526, 132.969)] # Start and end t
 filledTable["deltaT"] = filledTable["Time"].diff() # Delta time is difference between previous and curent time (I gotta keep labeling how pandas stuff works otherwise I'm forgetting instantly)
 
 for lapNumber, (start, end) in enumerate(laps, start=1): # For eveyr lap number, starting with lap 1 instead of 0
-    inLap = (filledTable["Time"] >= start) & (filledTable["Time"] < end) # In lap is when time is between start and end. shocker
-    lapRows = filledTable[inLap]
+	inLap = (filledTable["Time"] >= start) & (filledTable["Time"] < end) # In lap is when time is between start and end. shocker
+	lapRows = filledTable[inLap]
+	# I feel like these are all pretty self explanitory
+	maxSpeed = lapRows["Velocity"].max()
+	maxAccel = lapRows["Acceleration"].max()
+	timeAccel = filledTable[inLap & accelerating]["deltaT"].sum() # Sum of the total time that acelerating happens in laps
+	timeCoast = filledTable[inLap & coasting]["deltaT"].sum() # Sum of the total time coasting happens in laps
 
-    # I feel like these are all pretty self explanitory
-    maxSpeed  = lapRows["Velocity"].max()
-    maxAccel  = lapRows["Acceleration"].max()
-    timeAccel = filledTable[inLap & accelerating]["deltaT"].sum() # Sum of the total time that acelerating happens in laps
-    timeCoast = filledTable[inLap & coasting]["deltaT"].sum() # Sum of the total time coasting happens in laps
-
-    # print(lapNumber, maxSpeed, maxAccel, timeAccel, timeCoast)
+	# print(lapNumber, maxSpeed, maxAccel, timeAccel, timeCoast)
 
 # STEP 6
 
@@ -131,3 +130,6 @@ plt.show()
 
 # print(coastId[coastData.index].unique()) # Coasting segment IDs
 # print(coastData["deltaT"].sum()) # Total seconds of coast data
+
+# STEP 7
+
