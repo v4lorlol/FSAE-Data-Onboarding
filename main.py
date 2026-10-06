@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # STEP 1
-# Note to self: ctrl + / to mass comment or uncomment code
+# Note to self: ctrl + / to mass comment or uncomment code cause I keep forgetting this lmao
 
 # Setup options for the table
 pd.options.display.min_rows = 25
@@ -65,9 +65,6 @@ time = filledTable["Time"] # Yeah as many iterations as I've gone through of thi
 #    # wRPM = mRPM * 12 / 41     # Only here for testing lol
 #    vel = mRPM * wheelRad * (2 * math.pi / 60) * gearRatio
 #    print(time, vel)
-
-
-# STEP 3 Extension FOR FUTURE
 
 # Defining parameters for each state of the car
 driving       = filledTable["Velocity"] > 0.1
@@ -132,5 +129,5 @@ plt.ylabel("Velocity (m/s)")
 plt.title("Coasting Segments and Velocity Over Time")
 plt.show()
 
-print(coastId[coastData.index].unique()) # Coasting segment IDs
-print(coastData["deltaT"].sum()) # Total seconds of coast data
+# print(coastId[coastData.index].unique()) # Coasting segment IDs
+# print(coastData["deltaT"].sum()) # Total seconds of coast data
