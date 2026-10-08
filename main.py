@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # STEP 1
-# Note to self: ctrl + / to mass comment or uncomment code cause I keep forgetting this lmao
+# Note to self: ctrl + / to mass comment or uncomment code cause I keep forgetting this
 
 # Setup options for the table
 pd.options.display.min_rows = 25
