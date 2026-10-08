@@ -21,14 +21,13 @@ filledTable = rawData.ffill()
 # print("NaN counts per column:")  # Check if the forward fill was functioning correctly and if any NaNs remain
 # print(filledTable.isna().sum()) 
 
-
 # STEP 2 & 3
 
 # Defining the parameters (?) idk what to call them so it's parameters
 wheelRad = 0.2
 gearRatio = (12/41)
 filledTable["Velocity"] = filledTable["SME_TRQSPD_Speed"] * wheelRad * (2 * math.pi / 60) * gearRatio # Makes a new row in the table that is the velocity
-filledTable["VelocitySmooth"] = filledTable["Velocity"].rolling(200).mean() # Smooths the velocity function with Pandas rolling average
+filledTable["VelocitySmooth"] = filledTable["Velocity"].rolling(50, center=True).mean() # Smooths the velocity function with Pandas rolling average. I had to change this to centered after the lag from smoothing about a second of data was causing issues in the later steps!
 filledTable["Acceleration"] = filledTable["VelocitySmooth"].diff() / filledTable["Time"].diff() # Calculates acclration by dividing the smoothed velocity over time.
 time = filledTable["Time"] # Yeah as many iterations as I've gone through of this shit, its still time
 
@@ -120,17 +119,39 @@ cdLapDuration = filledTable.groupby(coastId)["deltaT"].transform("sum")  # Label
 coastData   = filledTable[coastDown & (cdLapDuration >= 1)]  # Only keep data that lasts over 1 second
 
 # Graph coasting segments on top of the velocity
-plt.figure()
-plt.plot(time, filledTable["Velocity"], alpha=0.3)
-plt.plot(coastData["Time"], coastData["Velocity"], marker='.', linestyle='', markersize=2)
-plt.xlabel("Time (seconds)")
-plt.ylabel("Velocity (m/s)")
-plt.title("Coasting Segments and Velocity Over Time")
-plt.show()
+# plt.figure()
+# plt.plot(time, filledTable["Velocity"], alpha=0.3)
+# plt.plot(coastData["Time"], coastData["Velocity"], marker='.', linestyle='', markersize=2)
+# plt.xlabel("Time (seconds)")
+# plt.ylabel("Velocity (m/s)")
+# plt.title("Coasting Segments and Velocity Over Time")
+# plt.show()
 
 # print(coastId[coastData.index].unique()) # Coasting segment IDs
 # print(coastData["deltaT"].sum()) # Total seconds of coast data
 
 # STEP 7
 
-#go here
+x = coastData["Velocity"] ** 2
+y = coastData["Acceleration"]
+# print(x.head())
+# print(y.head())
+# print(len(x))
+# print(len(y))
+
+slope, intercept = np.polyfit(x, y, 1)
+mEff = 244.08 # Effective mass (kg)
+m = 221.4 # True mass of the car (kg)
+p = 1.225 # Air density (kg/m^3) 
+g = 9.81 # Gravity (m/s)
+CdA = -2 * slope * mEff / p 
+Crr = Crr = -intercept * mEff / (m * g)
+print(slope, intercept, CdA, Crr)
+
+plt.figure()
+plt.plot(x, y, marker='.', linestyle='', markersize=2)
+xs = np.linspace(x.min(), x.max(), 100)
+plt.plot(xs, slope * xs + intercept, color='red')
+plt.xlabel("Velocity Squared")
+plt.ylabel("Acceleration")
+plt.show()
