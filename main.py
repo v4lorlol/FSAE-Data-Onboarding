@@ -144,10 +144,11 @@ mEff = 244.08 # Effective mass (kg)
 m = 221.4 # True mass of the car (kg)
 p = 1.225 # Air density (kg/m^3) 
 g = 9.81 # Gravity (m/s)
-CdA = -2 * slope * mEff / p 
-Crr = Crr = -intercept * mEff / (m * g)
-print(slope, intercept, CdA, Crr)
+CdA = -2 * slope * mEff / p # Solves for Drag * Frontal Area
+Crr = Crr = -intercept * mEff / (m * g) #  Solves for rolling resistance coefficient
+print(slope, intercept, CdA, Crr) # Print values for yes
 
+# Visualization graph
 plt.figure()
 plt.plot(x, y, marker='.', linestyle='', markersize=2)
 xs = np.linspace(x.min(), x.max(), 100)
